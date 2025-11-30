@@ -194,6 +194,15 @@ Synthetic-trained model drops 38.6 percentage points when tested on real images.
 - **ROS2 Integration:** Real-time leak detection for robotic inspection systems
 - **TensorRT Optimization:** Further acceleration for NVIDIA hardware
 
+**MLOps & Continuous Improvement:**
+- **Data Drift Monitoring:** Track prediction confidence and flag low-confidence detections
+- **Automated Data Collection:** Store edge cases and uncertain predictions for human review
+- **Retraining Pipeline:** Trigger retraining when drift metrics exceed thresholds
+- **Model Versioning:** Track all model iterations with MLflow or Weights & Biases
+- **A/B Testing:** Compare new vs old models before full deployment
+- **Continuous ONNX Re-export:** Automated pipeline to convert fine-tuned models back to ONNX
+- **Tools:** MLflow, Label Studio, DVC for data versioning, Evidently AI for drift detection
+
 ## Citation
 
 If you use this code, please cite:
