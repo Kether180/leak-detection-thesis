@@ -213,28 +213,97 @@ For deployment scenarios involving complex scenes with multiple pieces of equipm
 
 ## Future Work
 
-**Improving Synthetic Data Quality:**
-- **Domain Randomization:** Vary lighting, camera angles, backgrounds, and textures to reduce synthetic-to-real gap
-- **3D Physics Simulation:** Use platforms like NVIDIA Isaac Sim, Blender, or Unity for realistic fluid dynamics and leak behavior
-- **Camera/Sensor Simulation:** Add realistic camera noise, lens distortion, and motion blur
+### Roadmap to Production-Ready System
 
-**Model Improvements:**
-- **YOLO Integration:** Extend from classification to object detection with bounding boxes for leak localization
-- **Fine-tuning Pipeline:** Iteratively improve model with new real-world data and re-export to ONNX
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  PHASE 1: Data Enhancement                                                  │
+│  ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐         │
+│  │ Annotate Real   │ → │ 3D Simulation   │ → │ Domain          │         │
+│  │ Images (bbox)   │    │ (Isaac/Blender) │    │ Randomization   │         │
+│  └─────────────────┘    └─────────────────┘    └─────────────────┘         │
+├─────────────────────────────────────────────────────────────────────────────┤
+│  PHASE 2: Model Upgrade                                                     │
+│  ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐         │
+│  │ Train YOLOv8    │ → │ Hybrid Dataset  │ → │ ONNX/TensorRT   │         │
+│  │ Detection       │    │ (Real + 3D Syn) │    │ Export          │         │
+│  └─────────────────┘    └─────────────────┘    └─────────────────┘         │
+├─────────────────────────────────────────────────────────────────────────────┤
+│  PHASE 3: Production Deployment                                             │
+│  ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐         │
+│  │ Edge Deploy     │ → │ ROS2 Integration│ → │ MLOps Pipeline  │         │
+│  │ (Jetson/RPi)    │    │ (Real-time)     │    │ (Drift Monitor) │         │
+│  └─────────────────┘    └─────────────────┘    └─────────────────┘         │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
 
-**Deployment:**
-- **ONNX Export:** Deploy optimized models on edge devices (Jetson, Raspberry Pi)
-- **ROS2 Integration:** Real-time leak detection for robotic inspection systems
-- **TensorRT Optimization:** Further acceleration for NVIDIA hardware
+### Phase 1: Data Enhancement
 
-**MLOps & Continuous Improvement:**
-- **Data Drift Monitoring:** Track prediction confidence and flag low-confidence detections
-- **Automated Data Collection:** Store edge cases and uncertain predictions for human review
-- **Retraining Pipeline:** Trigger retraining when drift metrics exceed thresholds
-- **Model Versioning:** Track all model iterations with MLflow or Weights & Biases
-- **A/B Testing:** Compare new vs old models before full deployment
-- **Continuous ONNX Re-export:** Automated pipeline to convert fine-tuned models back to ONNX
-- **Tools:** MLflow, Label Studio, DVC for data versioning, Evidently AI for drift detection
+**1.1 Annotate Existing Images:**
+- Use **Label Studio** or **Roboflow** to add bounding box annotations
+- Annotate real images with leak locations (x, y, width, height)
+- Create YOLO-format labels (class_id, x_center, y_center, width, height)
+
+**1.2 3D Simulation Pipeline:**
+- **NVIDIA Isaac Sim** or **Blender** for photorealistic rendering
+- Simulate realistic fluid physics (oil viscosity, water flow, pooling)
+- Auto-generate bounding box labels from 3D scene geometry
+- Export in YOLO format with perfect annotations
+
+**1.3 Domain Randomization:**
+- Randomize: lighting (intensity, color, direction), camera pose, backgrounds
+- Vary surface textures (concrete, metal, painted surfaces)
+- Add sensor noise, motion blur, lens distortion
+- Goal: Reduce synthetic-to-real domain gap below 10%
+
+### Phase 2: Model Upgrade
+
+**2.1 YOLOv8 Object Detection:**
+```bash
+# Train YOLOv8 on annotated dataset
+yolo detect train data=leak_dataset.yaml model=yolov8m.pt epochs=100
+
+# Export to ONNX
+yolo export model=best.pt format=onnx
+```
+
+**2.2 Expected Improvements:**
+| Metric | Current (ResNet50) | Target (YOLOv8) |
+|--------|-------------------|-----------------|
+| Task | Classification | Detection + Localization |
+| Output | 3 class probabilities | Bounding boxes + confidence |
+| Speed | ~30 FPS | ~60+ FPS |
+| Actionable | "Leak exists" | "Leak at position (x,y)" |
+
+### Phase 3: Production Deployment
+
+**3.1 Edge Deployment:**
+- Convert YOLOv8 ONNX → TensorRT for Jetson optimization
+- Target: 60+ FPS on Jetson Orin Nano
+- Fallback: ONNX Runtime for CPU-only devices
+
+**3.2 ROS2 Integration:**
+- Create ROS2 node subscribing to camera topic
+- Publish detection results as `vision_msgs/Detection2DArray`
+- Enable robot to navigate to leak location
+
+**3.3 MLOps Pipeline:**
+- **Monitoring:** Track prediction confidence, flag uncertain detections
+- **Data Collection:** Store edge cases for human review
+- **Retraining:** Automated pipeline when drift exceeds threshold
+- **Model Versioning:** MLflow/W&B for experiment tracking
+- **CI/CD:** Auto-export to ONNX after successful training
+
+### Tools & Technologies
+
+| Category | Tools |
+|----------|-------|
+| 3D Simulation | NVIDIA Isaac Sim, Blender, Unity |
+| Annotation | Label Studio, Roboflow, CVAT |
+| Detection Model | YOLOv8, YOLOv9, RT-DETR |
+| Optimization | TensorRT, ONNX Runtime |
+| MLOps | MLflow, W&B, DVC, Evidently AI |
+| Deployment | ROS2, Docker, Kubernetes |
 
 ## Citation
 
