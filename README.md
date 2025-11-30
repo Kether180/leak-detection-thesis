@@ -213,52 +213,55 @@ For deployment scenarios involving complex scenes with multiple pieces of equipm
 
 ## Future Work
 
-### Roadmap to Production-Ready System
+### Recommended Priority Order
+
+Based on the thesis findings (99.37% hybrid accuracy, 38.6% domain gap), here's the practical prioritized approach:
+
+| Priority | Improvement | Effort | Impact | Cost | Recommendation |
+|----------|-------------|--------|--------|------|----------------|
+| **1** | YOLOv8 + bbox annotations | Medium | High | Free | **DO NOW** |
+| **2** | Fine-tune SD with LoRA | Low | Medium-High | Free | **DO NOW** |
+| **3** | Try SDXL/Flux | Low | Medium | Free | **DO NOW** |
+| **4** | ONNX/TensorRT deployment | Low | High | Free | **DO NOW** |
+| 5 | 3D Simulation | High | Medium | Time | Later |
+| 6 | Multi-modal sensors | Very High | High | $$$ | Production only |
+| 7 | Video/Temporal | High | Medium | Time | Needs new data |
+| 8 | More fluid classes | Medium | Low | Time | After detection works |
+
+### Practical Implementation Timeline
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│  PHASE 1: Data Enhancement                                                  │
-│  ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐         │
-│  │ Annotate Real   │ → │ 3D Simulation   │ → │ Domain          │         │
-│  │ Images (bbox)   │    │ (Isaac/Blender) │    │ Randomization   │         │
-│  └─────────────────┘    └─────────────────┘    └─────────────────┘         │
+│  IMMEDIATE PRIORITIES (Weeks 1-6)                                           │
 ├─────────────────────────────────────────────────────────────────────────────┤
-│  PHASE 2: Model Upgrade                                                     │
-│  ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐         │
-│  │ Train YOLOv8    │ → │ Hybrid Dataset  │ → │ ONNX/TensorRT   │         │
-│  │ Detection       │    │ (Real + 3D Syn) │    │ Export          │         │
-│  └─────────────────┘    └─────────────────┘    └─────────────────┘         │
+│  Week 1-2: Annotate real images (735) with bboxes → Train YOLOv8           │
+│  Week 3:   Fine-tune Stable Diffusion with LoRA on real images             │
+│  Week 4:   Generate new synthetic data, compare acceptance rates            │
+│  Week 5:   Test SDXL/Flux if domain gap persists                           │
+│  Week 6:   ONNX export + edge deployment testing                           │
 ├─────────────────────────────────────────────────────────────────────────────┤
-│  PHASE 3: Production Deployment                                             │
-│  ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐         │
-│  │ Edge Deploy     │ → │ ROS2 Integration│ → │ MLOps Pipeline  │         │
-│  │ (Jetson/RPi)    │    │ (Real-time)     │    │ (Drift Monitor) │         │
-│  └─────────────────┘    └─────────────────┘    └─────────────────┘         │
+│  LATER (If needed)                                                          │
+├─────────────────────────────────────────────────────────────────────────────┤
+│  - 3D Simulation: Only if fine-tuned SD still has domain gap issues        │
+│  - Multi-modal sensors: Production deployment with budget only             │
+│  - Video analysis: Requires new dataset collection                          │
+│  - Expanded taxonomy: After detection pipeline is solid                    │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
 
-### Phase 1: Data Enhancement
+---
+
+### Phase 1: YOLOv8 + Bounding Box Annotations (HIGH PRIORITY)
+
+**Why First:** Highest impact with existing data - gives you localization on top of 99.37% accuracy.
 
 **1.1 Annotate Existing Images:**
 - Use **Label Studio** or **Roboflow** to add bounding box annotations
-- Annotate real images with leak locations (x, y, width, height)
+- Annotate 735 real images with leak locations (x, y, width, height)
 - Create YOLO-format labels (class_id, x_center, y_center, width, height)
+- **Time estimate:** 1-2 weeks
 
-**1.2 3D Simulation Pipeline:**
-- **NVIDIA Isaac Sim** or **Blender** for photorealistic rendering
-- Simulate realistic fluid physics (oil viscosity, water flow, pooling)
-- Auto-generate bounding box labels from 3D scene geometry
-- Export in YOLO format with perfect annotations
-
-**1.3 Domain Randomization:**
-- Randomize: lighting (intensity, color, direction), camera pose, backgrounds
-- Vary surface textures (concrete, metal, painted surfaces)
-- Add sensor noise, motion blur, lens distortion
-- Goal: Reduce synthetic-to-real domain gap below 10%
-
-### Phase 2: Model Upgrade
-
-**2.1 YOLOv8 Object Detection:**
+**1.2 Train YOLOv8:**
 ```bash
 # Train YOLOv8 on annotated dataset
 yolo detect train data=leak_dataset.yaml model=yolov8m.pt epochs=100
@@ -267,7 +270,7 @@ yolo detect train data=leak_dataset.yaml model=yolov8m.pt epochs=100
 yolo export model=best.pt format=onnx
 ```
 
-**2.2 Expected Improvements:**
+**1.3 Expected Improvements:**
 | Metric | Current (ResNet50) | Target (YOLOv8) |
 |--------|-------------------|-----------------|
 | Task | Classification | Detection + Localization |
@@ -275,84 +278,103 @@ yolo export model=best.pt format=onnx
 | Speed | ~30 FPS | ~60+ FPS |
 | Actionable | "Leak exists" | "Leak at position (x,y)" |
 
-### Phase 3: Production Deployment
+---
 
-**3.1 Edge Deployment:**
-- Convert YOLOv8 ONNX → TensorRT for Jetson optimization
+### Phase 2: Fine-tune Generative Model (HIGH PRIORITY)
+
+**Why Second:** Address the 38.6% domain gap without new infrastructure.
+
+**2.1 LoRA/DreamBooth Fine-tuning:**
+- Fine-tune Stable Diffusion 2.1 on your 735 real images
+- Test if this improves the 8.8% oil leak acceptance rate
+- **Cost:** Free (uses existing GPU)
+
+**2.2 Try Alternative Models:**
+- **SDXL:** Higher resolution, better prompt following
+- **Flux:** Latest open-source alternative
+- Just swap the model in `src/generate.py` and compare acceptance rates
+
+---
+
+### Phase 3: Edge Deployment (HIGH PRIORITY)
+
+**3.1 ONNX Export:**
+```bash
+# Already available in src/export_to_onnx.py
+python src/export_to_onnx.py
+```
+
+**3.2 TensorRT Optimization (for Jetson):**
+- Convert ONNX → TensorRT for 2-3x speedup
 - Target: 60+ FPS on Jetson Orin Nano
-- Fallback: ONNX Runtime for CPU-only devices
 
-**3.2 ROS2 Integration:**
+**3.3 ROS2 Integration:**
 - Create ROS2 node subscribing to camera topic
 - Publish detection results as `vision_msgs/Detection2DArray`
 - Enable robot to navigate to leak location
 
-**3.3 MLOps Pipeline:**
+---
+
+### Phase 4: MLOps Pipeline (MEDIUM PRIORITY)
+
+**4.1 Continuous Improvement:**
 - **Monitoring:** Track prediction confidence, flag uncertain detections
 - **Data Collection:** Store edge cases for human review
 - **Retraining:** Automated pipeline when drift exceeds threshold
 - **Model Versioning:** MLflow/W&B for experiment tracking
 - **CI/CD:** Auto-export to ONNX after successful training
 
-### Phase 4: Extended Capabilities
+---
 
-**4.1 Expanded Fluid Taxonomy:**
-- Current: 3 classes (oil, water, no-leak)
-- Extended: hydraulic fluids, coolants, solvents, chemicals, biological materials
-- Each fluid has distinct visual properties (color, viscosity, transparency, surface tension)
-- Test if hybrid approach scales to more complex classification
+### Phase 5: Extended Capabilities (LATER / AS NEEDED)
 
-**4.2 Temporal Analysis (Video):**
-- Move from single-frame to video analysis
-- Architectures: **3D CNNs**, **LSTM**, **Temporal Transformers**
-- Enables:
-  - Active leak detection (distinguish ongoing leaks from static stains)
-  - Leak progression tracking (estimate severity from spread rate)
-  - Dripping motion detection
-  - Early detection before significant pooling
+**5.1 3D Simulation (HIGH EFFORT - DO LATER):**
+- Only pursue if fine-tuned SD still has domain gap issues
+- **NVIDIA Isaac Sim** or **Blender** for photorealistic rendering
+- Simulate realistic fluid physics (oil viscosity, water flow, pooling)
+- Auto-generate bounding box labels from 3D scene geometry
+- **Learning curve:** Steep, requires new skills
 
-**4.3 Pixel-wise Segmentation:**
-- Move from bounding boxes to precise boundary delineation
-- Architectures: **U-Net**, **DeepLab**, **Segment Anything (SAM)**
-- Enables:
-  - Precise leak area estimation
-  - Spatial tracking over time
-  - Weak supervision using Grad-CAM attention maps as pseudo-masks
+**5.2 Domain Randomization:**
+- Randomize: lighting, camera pose, backgrounds, surface textures
+- Add sensor noise, motion blur, lens distortion
+- Goal: Reduce synthetic-to-real domain gap below 10%
 
-**4.4 Domain Adaptation:**
-- Address the 38.6% domain gap with:
-  - **CycleGAN:** Translate synthetic → realistic without paired data
-  - **Adversarial Domain Adaptation:** Align feature representations during training
-  - **Style Transfer:** Apply real image textures to synthetic scenes
+**5.3 Domain Adaptation:**
+- **CycleGAN:** Translate synthetic → realistic without paired data
+- **Adversarial Domain Adaptation:** Align feature representations
 - Particularly valuable for oil leaks (only 8.8% passed quality filtering)
 
-**4.5 Fine-tuning Generative Models:**
-- **DreamBooth / LoRA:** Fine-tune Stable Diffusion on real leak images
-- Trade-off: diversity (generic) vs domain fidelity (fine-tuned)
-- Could reduce domain gap by matching target distribution
+**5.4 Pixel-wise Segmentation:**
+- Architectures: **U-Net**, **DeepLab**, **Segment Anything (SAM)**
+- Enables precise leak area estimation
+- Use Grad-CAM attention maps as pseudo-masks for weak supervision
 
-**4.6 Alternative Generative Models:**
-- Evaluate newer models vs Stable Diffusion 2.1:
-  - **SDXL:** Higher resolution, better prompt following
-  - **DALL-E 3:** Improved complex scenes and spatial relationships
-  - **Midjourney v5:** Highly photorealistic outputs
-  - **Flux:** Latest open-source alternative
-- Determine if domain gap is model-specific or inherent to text-to-image
+**5.5 Temporal Analysis (NEEDS NEW DATA):**
+- Move from single-frame to video analysis
+- Architectures: **3D CNNs**, **LSTM**, **Temporal Transformers**
+- Enables: active leak detection, progression tracking, dripping detection
+- **Requires:** Video dataset collection (not possible with current images)
 
-**4.7 Multi-Modal Detection:**
-- Complement RGB vision with additional sensing modalities for higher accuracy:
+**5.6 Expanded Fluid Taxonomy (AFTER DETECTION WORKS):**
+- Extended: hydraulic fluids, coolants, solvents, chemicals, biological materials
+- Each fluid has distinct visual properties
+- Test if hybrid approach scales to more complex classification
 
-| Modality | Benefit | Use Case |
-|----------|---------|----------|
-| **Thermal Imaging** | Oil/water have different thermal signatures | Distinguish fluid types by temperature |
-| **Hyperspectral** | Spectral signatures identify chemical composition | Classify fluids by spectral fingerprint |
-| **Acoustic Sensors** | Active leaks produce characteristic sounds | Detect dripping, spraying, hissing |
-| **Chemical Sensors** | Detect volatile compounds | Identify specific fluid types |
-| **Moisture Sensors** | Confirm water presence | Validate water leak detections |
+---
 
-- **Fusion Architectures:** Combine visual CNN with sensor embeddings
-- **Benefits:** Reduce false positives, improve confidence in ambiguous cases
-- **Trade-off:** Specialized hardware costs ($5,000-$50,000 per sensor system) vs RGB-only approach (~$100-$500)
+### Phase 6: Multi-Modal Detection (PRODUCTION ONLY - $$$)
+
+**⚠️ Important:** These are **real physical sensors** requiring hardware investment.
+
+| Modality | Benefit | Cost |
+|----------|---------|------|
+| **Thermal Camera** | Oil/water thermal signatures | $500-$5,000 |
+| **Hyperspectral** | Chemical composition | $10,000-$50,000 |
+| **Acoustic Sensors** | Detect dripping sounds | $100-$1,000 |
+| **Chemical Sensors** | Volatile compounds | $500-$5,000 |
+
+**When to consider:** Only for actual industrial deployment with budget approval.
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -383,22 +405,24 @@ yolo export model=best.pt format=onnx
 └─────────────────────────────────────────────────────────────┘
 ```
 
-### Tools & Technologies
+---
 
-| Category | Tools |
-|----------|-------|
-| 3D Simulation | NVIDIA Isaac Sim, Blender, Unity |
-| Annotation | Label Studio, Roboflow, CVAT |
-| Detection Model | YOLOv8, YOLOv9, RT-DETR |
-| Segmentation | U-Net, DeepLab, SAM |
-| Temporal | 3D CNN, LSTM, Video Transformers |
-| Domain Adaptation | CycleGAN, DANN, Style Transfer |
-| Generative | SD 2.1, SDXL, DALL-E 3, Flux |
-| Fine-tuning | DreamBooth, LoRA, Textual Inversion |
-| Optimization | TensorRT, ONNX Runtime |
-| MLOps | MLflow, W&B, DVC, Evidently AI |
-| Multi-Modal | FLIR thermal, hyperspectral cameras, acoustic arrays |
-| Deployment | ROS2, Docker, Kubernetes |
+### Tools & Technologies Summary
+
+| Category | Tools | Priority |
+|----------|-------|----------|
+| **Annotation** | Label Studio, Roboflow, CVAT | **NOW** |
+| **Detection Model** | YOLOv8, YOLOv9, RT-DETR | **NOW** |
+| **Fine-tuning** | DreamBooth, LoRA, Textual Inversion | **NOW** |
+| **Generative** | SD 2.1, SDXL, Flux | **NOW** |
+| **Optimization** | TensorRT, ONNX Runtime | **NOW** |
+| **Deployment** | ROS2, Docker | **NOW** |
+| MLOps | MLflow, W&B, DVC, Evidently AI | Medium |
+| 3D Simulation | NVIDIA Isaac Sim, Blender, Unity | Later |
+| Segmentation | U-Net, DeepLab, SAM | Later |
+| Temporal | 3D CNN, LSTM, Video Transformers | Later |
+| Domain Adaptation | CycleGAN, DANN, Style Transfer | Later |
+| Multi-Modal | FLIR thermal, hyperspectral, acoustic | Production |
 
 ## Citation
 
