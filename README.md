@@ -294,6 +294,51 @@ yolo export model=best.pt format=onnx
 - **Model Versioning:** MLflow/W&B for experiment tracking
 - **CI/CD:** Auto-export to ONNX after successful training
 
+### Phase 4: Extended Capabilities
+
+**4.1 Expanded Fluid Taxonomy:**
+- Current: 3 classes (oil, water, no-leak)
+- Extended: hydraulic fluids, coolants, solvents, chemicals, biological materials
+- Each fluid has distinct visual properties (color, viscosity, transparency, surface tension)
+- Test if hybrid approach scales to more complex classification
+
+**4.2 Temporal Analysis (Video):**
+- Move from single-frame to video analysis
+- Architectures: **3D CNNs**, **LSTM**, **Temporal Transformers**
+- Enables:
+  - Active leak detection (distinguish ongoing leaks from static stains)
+  - Leak progression tracking (estimate severity from spread rate)
+  - Dripping motion detection
+  - Early detection before significant pooling
+
+**4.3 Pixel-wise Segmentation:**
+- Move from bounding boxes to precise boundary delineation
+- Architectures: **U-Net**, **DeepLab**, **Segment Anything (SAM)**
+- Enables:
+  - Precise leak area estimation
+  - Spatial tracking over time
+  - Weak supervision using Grad-CAM attention maps as pseudo-masks
+
+**4.4 Domain Adaptation:**
+- Address the 38.6% domain gap with:
+  - **CycleGAN:** Translate synthetic → realistic without paired data
+  - **Adversarial Domain Adaptation:** Align feature representations during training
+  - **Style Transfer:** Apply real image textures to synthetic scenes
+- Particularly valuable for oil leaks (only 8.8% passed quality filtering)
+
+**4.5 Fine-tuning Generative Models:**
+- **DreamBooth / LoRA:** Fine-tune Stable Diffusion on real leak images
+- Trade-off: diversity (generic) vs domain fidelity (fine-tuned)
+- Could reduce domain gap by matching target distribution
+
+**4.6 Alternative Generative Models:**
+- Evaluate newer models vs Stable Diffusion 2.1:
+  - **SDXL:** Higher resolution, better prompt following
+  - **DALL-E 3:** Improved complex scenes and spatial relationships
+  - **Midjourney v5:** Highly photorealistic outputs
+  - **Flux:** Latest open-source alternative
+- Determine if domain gap is model-specific or inherent to text-to-image
+
 ### Tools & Technologies
 
 | Category | Tools |
@@ -301,6 +346,11 @@ yolo export model=best.pt format=onnx
 | 3D Simulation | NVIDIA Isaac Sim, Blender, Unity |
 | Annotation | Label Studio, Roboflow, CVAT |
 | Detection Model | YOLOv8, YOLOv9, RT-DETR |
+| Segmentation | U-Net, DeepLab, SAM |
+| Temporal | 3D CNN, LSTM, Video Transformers |
+| Domain Adaptation | CycleGAN, DANN, Style Transfer |
+| Generative | SD 2.1, SDXL, DALL-E 3, Flux |
+| Fine-tuning | DreamBooth, LoRA, Textual Inversion |
 | Optimization | TensorRT, ONNX Runtime |
 | MLOps | MLflow, W&B, DVC, Evidently AI |
 | Deployment | ROS2, Docker, Kubernetes |
