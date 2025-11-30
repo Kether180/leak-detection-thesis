@@ -178,6 +178,22 @@ sbatch slurm_jobs/job_exp_a.sh
 ### Domain Gap
 Synthetic-trained model drops 38.6 percentage points when tested on real images.
 
+## Future Work
+
+**Improving Synthetic Data Quality:**
+- **Domain Randomization:** Vary lighting, camera angles, backgrounds, and textures to reduce synthetic-to-real gap
+- **3D Physics Simulation:** Use platforms like NVIDIA Isaac Sim, Blender, or Unity for realistic fluid dynamics and leak behavior
+- **Camera/Sensor Simulation:** Add realistic camera noise, lens distortion, and motion blur
+
+**Model Improvements:**
+- **YOLO Integration:** Extend from classification to object detection with bounding boxes for leak localization
+- **Fine-tuning Pipeline:** Iteratively improve model with new real-world data and re-export to ONNX
+
+**Deployment:**
+- **ONNX Export:** Deploy optimized models on edge devices (Jetson, Raspberry Pi)
+- **ROS2 Integration:** Real-time leak detection for robotic inspection systems
+- **TensorRT Optimization:** Further acceleration for NVIDIA hardware
+
 ## Citation
 
 If you use this code, please cite:
