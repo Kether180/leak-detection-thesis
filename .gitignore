@@ -1,0 +1,24 @@
+# Data (too large for git)
+data/
+
+# Models (too large for git)
+models/*.pth
+models/*.pt
+
+# Logs
+logs/
+*.log
+*.err
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.ipynb_checkpoints/
+
+# System
+.DS_Store
+
+# IDE
+.vscode/
+.idea/

@@ -1,0 +1,7 @@
+image,predicted_class,confidence (%)
+no_leak.jpg,water_leak,98.34
+no_leak1.jpg,water_leak,98.37
+oil_leak2.jpg,water_leak,99.93
+oill_leak1.jpg,water_leak,100.00
+water_leak1.jpg,water_leak,96.29
+water_leak2.jpg,water_leak,99.99

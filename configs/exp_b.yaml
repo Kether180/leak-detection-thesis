@@ -1,0 +1,11 @@
+experiment: "B - Synthetic Only"
+model:
+  architecture: "ResNet50"
+  pretrained: "IMAGENET1K_V2"
+training:
+  learning_rate: 0.0003
+  batch_size: 32
+  epochs: 35
+  optimizer: "Adam"
+  weight_decay: 0.0001
+seed: 42

@@ -1,0 +1,9 @@
+              precision    recall  f1-score   support
+
+     no_leak       1.00      0.94      0.97        35
+    oil_leak       0.99      0.97      0.98       120
+  water_leak       0.95      0.99      0.97       108
+
+    accuracy                           0.97       263
+   macro avg       0.98      0.97      0.97       263
+weighted avg       0.97      0.97      0.97       263
