@@ -339,6 +339,50 @@ yolo export model=best.pt format=onnx
   - **Flux:** Latest open-source alternative
 - Determine if domain gap is model-specific or inherent to text-to-image
 
+**4.7 Multi-Modal Detection:**
+- Complement RGB vision with additional sensing modalities for higher accuracy:
+
+| Modality | Benefit | Use Case |
+|----------|---------|----------|
+| **Thermal Imaging** | Oil/water have different thermal signatures | Distinguish fluid types by temperature |
+| **Hyperspectral** | Spectral signatures identify chemical composition | Classify fluids by spectral fingerprint |
+| **Acoustic Sensors** | Active leaks produce characteristic sounds | Detect dripping, spraying, hissing |
+| **Chemical Sensors** | Detect volatile compounds | Identify specific fluid types |
+| **Moisture Sensors** | Confirm water presence | Validate water leak detections |
+
+- **Fusion Architectures:** Combine visual CNN with sensor embeddings
+- **Benefits:** Reduce false positives, improve confidence in ambiguous cases
+- **Trade-off:** Specialized hardware costs ($5,000-$50,000 per sensor system) vs RGB-only approach (~$100-$500)
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                  Multi-Modal Fusion Architecture            │
+│                                                             │
+│  ┌─────────┐   ┌─────────┐   ┌─────────┐   ┌─────────┐    │
+│  │  RGB    │   │ Thermal │   │ Audio   │   │ Chemical│    │
+│  │ Camera  │   │ Camera  │   │ Sensor  │   │ Sensor  │    │
+│  └────┬────┘   └────┬────┘   └────┬────┘   └────┬────┘    │
+│       │             │             │             │          │
+│       ▼             ▼             ▼             ▼          │
+│  ┌─────────┐   ┌─────────┐   ┌─────────┐   ┌─────────┐    │
+│  │  CNN    │   │  CNN    │   │  MLP    │   │  MLP    │    │
+│  │Features │   │Features │   │Features │   │Features │    │
+│  └────┬────┘   └────┬────┘   └────┬────┘   └────┬────┘    │
+│       │             │             │             │          │
+│       └─────────────┴──────┬──────┴─────────────┘          │
+│                            ▼                               │
+│                    ┌──────────────┐                        │
+│                    │    Fusion    │                        │
+│                    │    Layer     │                        │
+│                    └──────┬───────┘                        │
+│                           ▼                                │
+│                    ┌──────────────┐                        │
+│                    │  Detection   │                        │
+│                    │   Output     │                        │
+│                    └──────────────┘                        │
+└─────────────────────────────────────────────────────────────┘
+```
+
 ### Tools & Technologies
 
 | Category | Tools |
@@ -353,6 +397,7 @@ yolo export model=best.pt format=onnx
 | Fine-tuning | DreamBooth, LoRA, Textual Inversion |
 | Optimization | TensorRT, ONNX Runtime |
 | MLOps | MLflow, W&B, DVC, Evidently AI |
+| Multi-Modal | FLIR thermal, hyperspectral cameras, acoustic arrays |
 | Deployment | ROS2, Docker, Kubernetes |
 
 ## Citation
