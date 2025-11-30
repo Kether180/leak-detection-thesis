@@ -54,13 +54,35 @@ conda activate leak_detection
 pip install -r requirements.txt
 ```
 
-### 3. Download Data and Models
+### 3. Data Sources
 
-Data and models are too large for git. Download from:
-- **Dataset:** [Link to dataset]
-- **Trained Models:** [Link to models]
+The dataset combines multiple sources:
 
-Place files in `data/` and `models/` directories.
+**Real Images:**
+- **Roboflow:** Industrial leak detection datasets
+- **Pexels API:** Additional real-world leak imagery
+
+**Synthetic Images:**
+- Generated using **Stable Diffusion 2.1** with custom prompts
+- Quality-filtered using a ResNet18 classifier (40% confidence threshold)
+
+**Dataset Statistics:**
+| Class | Real Images | Synthetic Images |
+|-------|-------------|------------------|
+| Oil Leak | ~245 | ~490 |
+| Water Leak | ~245 | ~490 |
+| No Leak | ~245 | ~490 |
+
+*Note: Data files are not included in git due to size. Contact the author for access.*
+
+### 4. Trained Models
+
+Pre-trained models (`.pth` files) are excluded from git due to size.
+To use the models, either:
+1. Train from scratch using the provided scripts
+2. Contact the author for pre-trained weights
+
+Place model files in the `models/` directory.
 
 ## Usage
 
@@ -204,9 +226,9 @@ sbatch slurm_jobs/job_exp_a.sh
 
 1. **Always run from project root:** All scripts expect to be run from the `leak-detection-thesis/` directory
 
-2. **Data not included:** Due to size, download data separately and place in `data/` folder
+2. **Data not included:** Due to size, data is not in git. Contact the author or regenerate using `src/generate.py`
 
-3. **Models not included:** Download trained models and place in `models/` folder
+3. **Models not included:** Train from scratch or contact the author for pre-trained weights
 
 4. **Paths are relative:** The code automatically detects its location - no need to edit paths
 
