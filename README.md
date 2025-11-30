@@ -47,14 +47,36 @@ git clone https://github.com/kether180/leak-detection-thesis.git
 cd leak-detection-thesis
 ```
 
-### 2. Create Environment
+### 2. Hardware Requirements
+
+**Training (GPU recommended):**
+| Component | Minimum | Recommended |
+|-----------|---------|-------------|
+| GPU | NVIDIA GTX 1080 (8GB VRAM) | NVIDIA RTX 3090 / A100 |
+| RAM | 16 GB | 32 GB |
+| Storage | 50 GB SSD | 100 GB SSD |
+| CUDA | 11.7+ | 12.0+ |
+
+**Inference (CPU or GPU):**
+| Platform | Supported |
+|----------|-----------|
+| NVIDIA Jetson (Orin, Xavier) | Yes (ONNX + TensorRT) |
+| Raspberry Pi 4/5 | Yes (ONNX Runtime) |
+| Intel/AMD CPU | Yes (ONNX Runtime) |
+| Apple Silicon (M1/M2) | Yes (ONNX Runtime) |
+
+**Synthetic Data Generation (Stable Diffusion):**
+- Minimum 12GB VRAM for SD 2.1
+- Recommended: NVIDIA A100 / RTX 4090 for batch generation
+
+### 3. Create Environment
 ```bash
 conda create -n leak_detection python=3.10
 conda activate leak_detection
 pip install -r requirements.txt
 ```
 
-### 3. Data Sources
+### 4. Data Sources
 
 The dataset combines multiple sources:
 
@@ -75,7 +97,7 @@ The dataset combines multiple sources:
 
 *Note: Data files are not included in git due to size. Contact the author for access.*
 
-### 4. Trained Models
+### 5. Trained Models
 
 Pre-trained models (`.pth` files) are excluded from git due to size.
 To use the models, either:
