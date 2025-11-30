@@ -219,14 +219,14 @@ Based on the thesis findings (99.37% hybrid accuracy, 38.6% domain gap), here's 
 
 | Priority | Improvement | Effort | Impact | Cost | Recommendation |
 |----------|-------------|--------|--------|------|----------------|
-| **1** | YOLOv8 + bbox annotations | Medium | High | Free | **DO NOW** |
-| **2** | Fine-tune SD with LoRA | Low | Medium-High | Free | **DO NOW** |
-| **3** | Try SDXL/Flux | Low | Medium | Free | **DO NOW** |
-| **4** | ONNX/TensorRT deployment | Low | High | Free | **DO NOW** |
-| 5 | 3D Simulation | High | Medium | Time | Later |
-| 6 | Multi-modal sensors | Very High | High | $$$ | Production only |
-| 7 | Video/Temporal | High | Medium | Time | Needs new data |
-| 8 | More fluid classes | Medium | Low | Time | After detection works |
+| **1** | YOLOv8 + bbox annotations | Medium | High | Free | **Priority** |
+| **2** | Fine-tune SD with LoRA | Low | Medium-High | Free | **Priority** |
+| **3** | Try SDXL/Flux | Low | Medium | Free | **Priority** |
+| **4** | ONNX/TensorRT deployment | Low | High | Free | **Priority** |
+| 5 | 3D Simulation | High | Medium | Time | Deferred |
+| 6 | Multi-modal sensors | Very High | High | $$$ | Production Phase |
+| 7 | Video/Temporal | High | Medium | Time | Requires Dataset |
+| 8 | More fluid classes | Medium | Low | Time | Post-Detection |
 
 ### Practical Implementation Timeline
 
