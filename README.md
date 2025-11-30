@@ -189,6 +189,10 @@ sbatch slurm_jobs/job_exp_a.sh
 | `src/gradcam.py` | Generate Grad-CAM attention visualizations |
 | `src/create_experiment_datasets.py` | Create train/val/test splits |
 | `src/train_filter_classifier.py` | Train ResNet18 filter classifier |
+| `src/prepare_yolo_dataset.py` | Prepare dataset for YOLOv8 annotation |
+| `src/train_yolo.py` | Train YOLOv8 object detection model |
+| `src/inference_yolo.py` | Run YOLOv8 inference on images/video |
+| `src/export_yolo_to_onnx.py` | Export YOLOv8 to ONNX format |
 
 ## Results
 

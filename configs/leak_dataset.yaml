@@ -1,0 +1,29 @@
+# YOLOv8 Dataset Configuration for Leak Detection
+# ================================================
+#
+# This config file defines the dataset structure for training
+# YOLOv8 object detection on industrial leak images.
+#
+# Usage:
+#   yolo detect train data=configs/leak_dataset.yaml model=yolov8m.pt epochs=100
+#
+# Or with the training script:
+#   python src/train_yolo.py
+
+# Dataset paths (relative to project root)
+path: data/yolo  # Dataset root directory
+train: images/train  # Train images (relative to 'path')
+val: images/val  # Val images (relative to 'path')
+
+# Classes
+# Note: no_leak images have empty label files (background only)
+names:
+  0: oil_leak
+  1: water_leak
+
+# Number of classes
+nc: 2
+
+# Dataset statistics (after running prepare_yolo_dataset.py)
+# Train: ~842 images (170 oil, 352 water, 320 no_leak)
+# Val: ~211 images (43 oil, 88 water, 80 no_leak)

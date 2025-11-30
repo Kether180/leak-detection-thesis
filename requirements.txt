@@ -34,3 +34,6 @@ requests==2.32.3
 # --- Optional (for HPC / ONNX export) ---
 onnx==1.16.0
 onnxruntime==1.17.1
+
+# --- Object Detection (YOLOv8) ---
+ultralytics==8.2.0
