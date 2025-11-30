@@ -200,6 +200,17 @@ sbatch slurm_jobs/job_exp_a.sh
 ### Domain Gap
 Synthetic-trained model drops 38.6 percentage points when tested on real images.
 
+### Limitations
+
+**Classification vs Detection:**
+This work addresses leak detection as an **image classification** problem rather than object detection. While classification determines whether a leak exists in an image, it does not provide spatial localization indicating where the leak appears.
+
+For deployment scenarios involving complex scenes with multiple pieces of equipment, object detection approaches such as **YOLOv7/v8** would provide more actionable information by drawing bounding boxes around detected leaks. However:
+- Object detection requires **bounding box annotations** not available for this dataset
+- Generating synthetic images with accurate **spatial labels** presents additional methodological challenges beyond whole-image generation
+
+*Future work could extend this to object detection once annotated data becomes available.*
+
 ## Future Work
 
 **Improving Synthetic Data Quality:**
